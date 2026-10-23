@@ -1,0 +1,4 @@
+# Mods proibidos neste pacote.
+#
+Um por linha, com ou sem .jar. Quem estiver nesta lista nunca carrega —
+nem o que o próprio servidor mandar, nem o que já estivesse no disco.
