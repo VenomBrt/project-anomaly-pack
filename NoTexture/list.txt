@@ -1,0 +1,4 @@
+# Texturas proibidas neste pacote.
+#
+Um por linha: nome do .zip como está em resourcepacks/. O launcher apaga o
+arquivo e tira do options.txt.

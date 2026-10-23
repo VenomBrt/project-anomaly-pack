@@ -1,0 +1,31 @@
+name: release
+
+# Publicar uma tag (`v1.0.0`) é publicar uma atualização: o manifest é gerado
+# com as impressões digitais dos arquivos e anexado à release. É esse anexo que
+# o launcher baixa.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Gerar o manifest
+        run: node tools/make-manifest.mjs
+
+      - name: Publicar a release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: manifest.json
+          generate_release_notes: true
