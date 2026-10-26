@@ -3,6 +3,17 @@
 Este repositório é o que o launcher baixa. Ele não tem código: tem o conteúdo que
 define o cliente do servidor — mods, configs, texturas, servidor e lore.
 
+## Baixar o launcher
+
+O link do jogador é sempre o mesmo:
+
+**https://venombrt.github.io/project-anomaly-releases/**
+
+A página reconhece o sistema e entrega o `.exe` (Windows) ou o `.AppImage` e o
+`.deb` (Linux). Os instaladores ficam no repositório de downloads, não aqui: este
+repositório só tem conteúdo, e é por isso que ele pode ser aberto sem expor o
+programa.
+
 **Toda publicação aqui vira atualização no launcher.** O launcher consulta a
 release mais recente ao abrir e ao clicar em acessar, compara as impressões
 digitais e baixa só o que mudou. Quem já está jogando recebe no próximo clique.
