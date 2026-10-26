@@ -1,0 +1,23 @@
+name: conferir
+
+# Toda edição passa por aqui antes de virar release: o mesmo script que gera o
+# manifest confere as pastas. Se algo estiver no lugar errado, o ✅ fica vermelho
+# com o motivo na aba Actions — melhor aqui do que na máquina de quem joga.
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pacote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Conferir o pacote
+        run: node tools/make-manifest.mjs --check

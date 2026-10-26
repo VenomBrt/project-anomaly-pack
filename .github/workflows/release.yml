@@ -1,12 +1,21 @@
 name: release
 
-# Publicar uma tag (`v1.0.0`) é publicar uma atualização: o manifest é gerado
-# com as impressões digitais dos arquivos e anexado à release. É esse anexo que
-# o launcher baixa.
+# Publicar uma tag (`v1.0.0`) é publicar uma atualização: o manifest é gerado com
+# as impressões digitais dos arquivos e anexado à release. É esse anexo que o
+# launcher baixa — e é ele que faz a atualização chegar em quem já joga.
+#
+# O pacote é conferido antes de virar release: um mod que não é jar, um zip de
+# textura sem pack.mcmeta ou uma tag que não bate com a versão do `pack.json`
+# param a publicação com o motivo escrito no log.
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag a publicar (ex.: v1.1.0) — só para publicar na mão'
+        required: true
 
 permissions:
   contents: write
@@ -21,11 +30,12 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Gerar o manifest
-        run: node tools/make-manifest.mjs
+      - name: Gerar o manifest (e conferir o pacote)
+        run: node tools/make-manifest.mjs --expect-version "${{ github.event.inputs.version || github.ref_name }}"
 
       - name: Publicar a release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.inputs.version || github.ref_name }}
           files: manifest.json
           generate_release_notes: true
