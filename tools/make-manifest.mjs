@@ -99,6 +99,87 @@ function checkServerJson(text, path) {
   }
 }
 
+/**
+ * Confere a lore antes de ela virar release.
+ *
+ * O launcher ignora data torta e id desconhecido de propósito, para um pacote
+ * novo não quebrar um launcher antigo. Só que ignorar em silêncio é o pior jeito
+ * de descobrir um erro de digitação: a seção simplesmente não abre no dia
+ * marcado, e ninguém fica sabendo. Aqui o erro aparece na aba Actions.
+ */
+function checkLoreJson(text, path) {
+  let parsed
+  try {
+    parsed = JSON.parse(text)
+  } catch (error) {
+    bad(`${path}: não é JSON válido (${error.message}).`)
+    return
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    bad(`${path}: o arquivo precisa ser um objeto.`)
+    return
+  }
+
+  const liberacao = parsed.liberacao
+  if (liberacao !== undefined) {
+    if (liberacao === null || typeof liberacao !== 'object' || Array.isArray(liberacao)) {
+      bad(`${path}: "liberacao" precisa ser um objeto de id para data, ex.: { "iv": "2026-11-22" }.`)
+    } else {
+      for (const [id, day] of Object.entries(liberacao)) {
+        if (id.trim().length === 0) bad(`${path}: "liberacao" tem uma entrada sem id.`)
+        else if (!realDay(day)) {
+          bad(`${path}: "liberacao.${id}" tem "${day}". Use AAAA-MM-DD, e uma data que exista.`)
+        }
+      }
+    }
+  }
+
+  const sections = parsed.archive?.sections
+  if (sections === undefined) return
+  if (!Array.isArray(sections)) {
+    bad(`${path}: "archive.sections" precisa ser uma lista.`)
+    return
+  }
+
+  const ids = new Set()
+  sections.forEach((section, index) => {
+    const where = `${path}: archive.sections[${index}]`
+    if (section === null || typeof section !== 'object' || Array.isArray(section)) {
+      bad(`${where} precisa ser um objeto.`)
+      return
+    }
+    if (typeof section.id !== 'string' || section.id.trim().length === 0) {
+      bad(`${where} precisa de "id".`)
+    } else if (ids.has(section.id)) {
+      bad(`${where}: o id "${section.id}" já apareceu. Id repetido substitui a seção errada.`)
+    } else {
+      ids.add(section.id)
+    }
+    if (typeof section.title !== 'string' || section.title.trim().length === 0) {
+      bad(`${where} precisa de "title".`)
+    }
+    if (!Array.isArray(section.blocks) || section.blocks.length === 0) {
+      bad(`${where} precisa de "blocks" com pelo menos um bloco.`)
+    }
+    if (section.abrir !== undefined && !realDay(section.abrir)) {
+      bad(`${where}: "abrir" tem "${section.abrir}". Use AAAA-MM-DD.`)
+    }
+  })
+}
+
+/** A data existe no calendário? 31 de fevereiro não existe. */
+function realDay(value) {
+  if (typeof value !== 'string') return false
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim())
+  if (!match) return false
+  const [, year, month, day] = match
+  const date = new Date(Number(year), Number(month) - 1, Number(day))
+  return (
+    date.getFullYear() === Number(year) &&
+    date.getMonth() === Number(month) - 1 &&
+    date.getDate() === Number(day)
+  )
+}
 async function walk(dir, out, rule = RULES[dir]) {
   let entries
   try {
@@ -139,6 +220,7 @@ async function walk(dir, out, rule = RULES[dir]) {
 
     if (rule.json) {
       if (path === 'Server/server.json') checkServerJson(buffer.toString('utf8'), path)
+      else if (path === 'Lore/lore.json') checkLoreJson(buffer.toString('utf8'), path)
       else {
         try {
           JSON.parse(buffer.toString('utf8'))

@@ -28,7 +28,7 @@ digitais e baixa só o que mudou. Quem já está jogando recebe no próximo cliq
 | `Forcepack/` | Packs de textura forçados (`.zip` com `pack.mcmeta`). Vão para `resourcepacks/` e para o topo do `options.txt` — ninguém consegue desligar. |
 | `NoTexture/` | `list.txt` com packs proibidos. O launcher apaga o arquivo e tira do `options.txt`. |
 | `Server/` | `server.json` com `address`, `port` e `autoJoin`. Com `autoJoin: true`, o jogo abre já entrando no servidor. |
-| `Lore/` | `lore.json` com a lore do launcher: o documento do Arquivo, os carimbos e o censo de cada estágio. |
+| `Lore/` | `lore.json` com o documento do Arquivo, o censo de cada estágio e a **agenda de liberação** das seções. |
 
 Arquivos `README.md`, `.gitkeep` e pastas começando com `.` são ignorados — não
 viram conteúdo do pacote.
@@ -98,6 +98,9 @@ O documento inteiro do Arquivo (`archive`) e/ou os números dos estágios:
     "1948": { "stamp": "1948", "population": 82 },
     "1967": { "stamp": "02/07/1967", "population": 426 }
   },
+  "liberacao": {
+    "novo-capitulo": "2026-11-22"
+  },
   "archive": {
     "title": "RIVER PINES: O ARQUIVO DOS DESAPARECIDOS",
     "subtitle": "...",
@@ -122,6 +125,49 @@ Tipos de bloco: `title`, `dateline`, `source`, `head`, `para`, `transcript`,
 `entry` (com `at` para a data). Fontes: `registro`, `jornal`, `log`,
 `transcricao`, `arquivo`.
 
+## A lore abre por partes
+
+A lore não chega toda de uma vez. Cada seção do Arquivo tem um dia de liberação:
+antes disso ela aparece **lacrada** na tela — o número, o selo e a data, sem o
+texto. Quem decide é o bloco `liberacao` do `Lore/lore.json`, e é só ele que
+precisa ser editado para ir soltando a história:
+
+```json
+"liberacao": {
+  "nota-introdutória-sobre-a-integridade-dos-documentos": "2026-11-01",
+  "i": "2026-11-01",
+  "iv": "2026-11-22"
+}
+```
+
+- **O id é o da seção.** As que vêm dentro do launcher são
+  `nota-introdutória-sobre-a-integridade-dos-documentos`, `i`, `ii`, `iii`, `iv`,
+  `v`, `vi`, `vii`, `viii`, `ix`, `x`, `xi`, `xii` e `declaração-de-encerramento`.
+- **Sem data, a seção está aberta.** Id que não existe é ignorado — o pacote pode
+  ser mais novo que o launcher.
+- **A data é local e vira à meia-noite.** `2026-11-08` abre no dia 8, para todo
+  mundo, sem ninguém precisar baixar nada de novo.
+- **A agenda viaja junto com a release.** Depois de mexer, suba a `version` do
+  `pack.json` e publique a tag; a partir daí as aberturas acontecem sozinhas.
+
+Para ver a agenda de hoje em diante (opcional, precisa de Node 20+):
+
+```
+node tools/lore.mjs                       # a agenda
+node tools/lore.mjs abrir iv              # abre agora
+node tools/lore.mjs abrir iv 2026-11-22   # agenda para o dia 22
+```
+
+### Escrever lore nova
+
+Lore nova não precisa de launcher novo: entra em `archive.sections` do
+`Lore/lore.json`, junto com a data dela na agenda. `node tools/lore.mjs nova
+cap-xiii "O QUE ACONTECEU DEPOIS"` cria o esqueleto — nasce lacrada por uma
+semana, para dar tempo de escrever — e é só preencher os blocos.
+
+Uma seção com o **mesmo `id`** de uma que já existe substitui a do launcher, o
+que serve para corrigir um nome ou reescrever um parágrafo. Um `id` novo entra
+no fim do arquivo.
 ## O que o launcher faz com isso
 
 - Baixa só os arquivos cuja impressão digital mudou.
