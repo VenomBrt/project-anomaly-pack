@@ -28,7 +28,13 @@ digitais e baixa só o que mudou. Quem já está jogando recebe no próximo cliq
 | `Forcepack/` | Packs de textura forçados (`.zip` com `pack.mcmeta`). Vão para `resourcepacks/` e para o topo do `options.txt` — ninguém consegue desligar. |
 | `NoTexture/` | `list.txt` com packs proibidos. O launcher apaga o arquivo e tira do `options.txt`. |
 | `Server/` | `server.json` com `address`, `port` e `autoJoin`. Com `autoJoin: true`, o jogo abre já entrando no servidor. |
-| `Lore/` | `lore.json` com o documento do Arquivo, o censo de cada estágio e a **agenda de liberação** das seções. |
+| `Lore/` | `lore.json` com o documento do Arquivo, o censo de cada estágio e a **agenda de liberação** das seções; `capitulos.txt` com o estado explícito de quais capítulos estão abertos. |
+
+O pacote inclui `CustomSkinLoader_ForgeV2-14.28.jar` para as skins offline. O
+launcher grava a skin escolhida em
+`CustomSkinLoader/LocalSkin/skins/<nome>.png` antes de abrir o jogo; a lista
+padrão do mod já lê `LocalSkin`. O jar é distribuído sem modificação, com a
+licença e a atribuição dentro dele.
 
 Arquivos `README.md`, `.gitkeep` e pastas começando com `.` são ignorados — não
 viram conteúdo do pacote.
@@ -125,12 +131,22 @@ Tipos de bloco: `title`, `dateline`, `source`, `head`, `para`, `transcript`,
 `entry` (com `at` para a data). Fontes: `registro`, `jornal`, `log`,
 `transcricao`, `arquivo`.
 
+### O texto da lore
+
+O documento inteiro do Arquivo vive em `archive.sections` do `Lore/lore.json`.
+É esse o lugar para editar o texto no GitHub: procure a seção pelo `id` (o `id`
+`i` é o capítulo I) e altere os blocos. Um `id` que já existe substitui a seção
+inteira; um `id` novo entra no fim do documento. Para escrever uma seção nova, o
+comando `node tools/lore.mjs nova cap-xiii "O QUE ACONTECEU DEPOIS"` cria o
+esqueleto e a data na agenda.
+
 ## A lore abre por partes
 
 A lore não chega toda de uma vez. Cada seção do Arquivo tem um dia de liberação:
 antes disso ela aparece **lacrada** na tela — o número, o selo e a data, sem o
-texto. Quem decide é o bloco `liberacao` do `Lore/lore.json`, e é só ele que
-precisa ser editado para ir soltando a história:
+texto. A agenda `liberacao` do `Lore/lore.json` abre pelas datas; o
+`Lore/capitulos.txt` é a lista explícita que vence a agenda quando precisar
+abrir ou fechar uma seção fora do dia.
 
 ```json
 "liberacao": {
@@ -140,11 +156,21 @@ precisa ser editado para ir soltando a história:
 }
 ```
 
+O `capitulos.txt` é opcional; quando existe, manda:
+
+```txt
+introducao = true
+capitulo 1 = true
+```
+
+`true` abre e `false` fecha, mesmo que a agenda diga outra coisa. Sem uma linha
+explícita e sem data, a seção fica lacrada.
+
 - **O id é o da seção.** As que vêm dentro do launcher são
   `nota-introdutória-sobre-a-integridade-dos-documentos`, `i`, `ii`, `iii`, `iv`,
   `v`, `vi`, `vii`, `viii`, `ix`, `x`, `xi`, `xii` e `declaração-de-encerramento`.
-- **Sem data, a seção está aberta.** Id que não existe é ignorado — o pacote pode
-  ser mais novo que o launcher.
+- **Sem data e sem lista, a seção está lacrada.** Id que não existe é ignorado —
+  o pacote pode ser mais novo que o launcher.
 - **A data é local e vira à meia-noite.** `2026-11-08` abre no dia 8, para todo
   mundo, sem ninguém precisar baixar nada de novo.
 - **A agenda viaja junto com a release.** Depois de mexer, suba a `version` do
@@ -167,7 +193,9 @@ semana, para dar tempo de escrever — e é só preencher os blocos.
 
 Uma seção com o **mesmo `id`** de uma que já existe substitui a do launcher, o
 que serve para corrigir um nome ou reescrever um parágrafo. Um `id` novo entra
-no fim do arquivo.
+no fim do arquivo. Se a seção nova deve abrir agora, acrescente
+`capitulo 13 = true` ao `capitulos.txt`; caso contrário, a agenda cuida da data.
+
 ## O que o launcher faz com isso
 
 - Baixa só os arquivos cuja impressão digital mudou.
