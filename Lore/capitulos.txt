@@ -1,0 +1,20 @@
+# O launcher lê este arquivo para saber o que já pode ser lido.
+# O bloco "liberacao" do lore.json mantém a agenda, mas a versão 0.3.3
+# ainda não o aplica; para abrir uma seção, acrescente a linha dela aqui.
+
+introducao = true
+capitulo 1 = true
+capitulo 2 = true
+
+# Agenda original (lore.json):
+# capitulo 3  = 2026-11-15
+# capitulo 4  = 2026-11-22
+# capitulo 5  = 2026-11-29
+# capitulo 6  = 2026-12-06
+# capitulo 7  = 2026-12-13
+# capitulo 8  = 2026-12-20
+# capitulo 9  = 2026-12-27
+# capitulo 10 = 2027-01-03
+# capitulo 11 = 2027-01-10
+# capitulo 12 = 2027-01-17
+# encerramento = 2027-01-24

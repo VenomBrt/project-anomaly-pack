@@ -15,7 +15,7 @@
  *   NoMods/      list.txt
  *   NoTexture/   list.txt
  *   Server/      server.json (address, port, autoJoin)
- *   Lore/        lore.json
+ *   Lore/        lore.json e capitulos.txt
  *
  * Uso:
  *   node tools/make-manifest.mjs                      gera o manifest.json
@@ -50,7 +50,7 @@ const RULES = {
   NoMods: { only: ['list.txt'] },
   NoTexture: { only: ['list.txt'] },
   Server: { only: ['server.json'], json: true },
-  Lore: { only: ['lore.json'], json: true }
+  Lore: { only: ['lore.json', 'capitulos.txt'] }
 }
 const DIRS = Object.keys(RULES)
 
@@ -218,9 +218,10 @@ async function walk(dir, out, rule = RULES[dir]) {
     const info = await stat(file)
     const buffer = await readFile(file)
 
-    if (rule.json) {
+    if (path === 'Lore/lore.json') {
+      checkLoreJson(buffer.toString('utf8'), path)
+    } else if (rule.json) {
       if (path === 'Server/server.json') checkServerJson(buffer.toString('utf8'), path)
-      else if (path === 'Lore/lore.json') checkLoreJson(buffer.toString('utf8'), path)
       else {
         try {
           JSON.parse(buffer.toString('utf8'))
