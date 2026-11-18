@@ -1,0 +1,22 @@
+name: conferir
+
+# Confere o pacote em todo envio e em todo pull request. Não publica nada.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pacote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Conferir pastas, lore e manifest
+        run: node tools/make-manifest.mjs --check

@@ -1,6 +1,6 @@
 # O launcher lê este arquivo para saber o que já pode ser lido.
-# O bloco "liberacao" do lore.json mantém a agenda, mas a versão 0.3.3
-# ainda não o aplica; para abrir uma seção, acrescente a linha dela aqui.
+# O bloco "liberacao" do lore.json é aplicado a partir da 0.3.4; uma linha
+# explícita aqui vence a agenda quando for preciso abrir ou fechar na mão.
 
 introducao = true
 capitulo 1 = true

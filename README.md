@@ -28,7 +28,7 @@ digitais e baixa só o que mudou. Quem já está jogando recebe no próximo cliq
 | `Forcepack/` | Packs de textura forçados (`.zip` com `pack.mcmeta`). Vão para `resourcepacks/` e para o topo do `options.txt` — ninguém consegue desligar. |
 | `NoTexture/` | `list.txt` com packs proibidos. O launcher apaga o arquivo e tira do `options.txt`. |
 | `Server/` | `server.json` com `address`, `port` e `autoJoin`. Com `autoJoin: true`, o jogo abre já entrando no servidor. |
-| `Lore/` | `lore.json` com o documento do Arquivo, o censo de cada estágio e a **agenda de liberação** das seções; `capitulos.txt` com o estado explícito de quais capítulos estão abertos. |
+| `Lore/` | `lore.json` é o **índice** do Arquivo (título, ordem, censo dos estágios, agenda); `Lore/texto/*.txt` é o texto de cada seção; `capitulos.txt` é o estado explícito de quais capítulos estão abertos. |
 
 O pacote inclui `CustomSkinLoader_ForgeV2-14.28.jar` para as skins offline. O
 launcher grava a skin escolhida em
@@ -96,7 +96,8 @@ o endereço é obrigatório (a conferência recusa sem ele).
 
 ### `Lore/lore.json`
 
-O documento inteiro do Arquivo (`archive`) e/ou os números dos estágios:
+O índice do Arquivo e/ou os números dos estágios. A seção não guarda o texto: o
+`file` aponta para o `.txt` que guarda os blocos.
 
 ```json
 {
@@ -117,28 +118,53 @@ O documento inteiro do Arquivo (`archive`) e/ou os números dos estágios:
         "numeral": "VII",
         "title": "O QUE FICOU FORA DO REGISTRO",
         "source": "log",
-        "blocks": [
-          { "kind": "dateline", "text": "RIVER PINES, 1967" },
-          { "kind": "para", "text": "..." }
-        ]
+        "file": "texto/novo-capitulo.txt"
       }
     ]
   }
 }
 ```
 
-Tipos de bloco: `title`, `dateline`, `source`, `head`, `para`, `transcript`,
-`entry` (com `at` para a data). Fontes: `registro`, `jornal`, `log`,
+O `file` é sempre relativo a `Lore/` e precisa continuar dentro de `Lore/texto/`
+(por exemplo: `texto/03-capitulo-iii.txt`). Caminho com `..`, barra invertida ou
+outra pasta não é lido. O índice também aceita `blocks` para uma seção antiga,
+mas o formato novo usa um arquivo por seção. Fontes: `registro`, `jornal`, `log`,
 `transcricao`, `arquivo`.
 
 ### O texto da lore
 
-O documento inteiro do Arquivo vive em `archive.sections` do `Lore/lore.json`.
-É esse o lugar para editar o texto no GitHub: procure a seção pelo `id` (o `id`
-`i` é o capítulo I) e altere os blocos. Um `id` que já existe substitui a seção
-inteira; um `id` novo entra no fim do documento. Para escrever uma seção nova, o
-comando `node tools/lore.mjs nova cap-xiii "O QUE ACONTECEU DEPOIS"` cria o
-esqueleto e a data na agenda.
+O texto de cada seção vive em um arquivo separado em `Lore/texto/`. Para mudar a
+lore no GitHub, abra o `.txt` da seção (o capítulo I é
+`Lore/texto/01-capitulo-i.txt`) e escreva. O `lore.json` só precisa do `file`
+com o nome do arquivo.
+
+O formato é texto comum, uma linha por bloco. Quando a linha tem um papel
+especial, comece com um marcador:
+
+```txt
+::dateline RIVER PINES, 1967
+
+::source Registro registrado pelo escrivão da prefeitura.
+
+O texto do parágrafo vem assim, direto, sem marcador.
+
+::head O QUE FICOU FORA DO REGISTRO
+
+::transcript — e não fui a única.
+
+::entry 02/07/1967 | o hotel encerra as atividades
+```
+
+Marcadores: `title`, `dateline`, `source`, `head`, `para`, `transcript` e
+`entry` (a data vem antes do `|`). Sem marcador, o leitor reconhece data, fonte,
+transcrição, item de cronologia e título em maiúsculas; o resto é parágrafo.
+Linhas vazias e linhas que começam com `#` são ignoradas.
+
+**Para entrar no Arquivo, o arquivo precisa estar no índice.** Criar
+`Lore/texto/cap-xiii.txt` não basta: acrescente uma seção em
+`archive.sections` com `id` novo e `file: "texto/cap-xiii.txt"`. Se você tirar a
+seção do índice, o texto sai do Arquivo, mesmo que o `.txt` continue no
+repositório.
 
 ## A lore abre por partes
 
@@ -186,15 +212,47 @@ node tools/lore.mjs abrir iv 2026-11-22   # agenda para o dia 22
 
 ### Escrever lore nova
 
-Lore nova não precisa de launcher novo: entra em `archive.sections` do
-`Lore/lore.json`, junto com a data dela na agenda. `node tools/lore.mjs nova
-cap-xiii "O QUE ACONTECEU DEPOIS"` cria o esqueleto — nasce lacrada por uma
-semana, para dar tempo de escrever — e é só preencher os blocos.
+Lore nova não precisa de launcher novo: crie o `.txt` em `Lore/texto/` e
+acrescente a seção em `archive.sections` do `Lore/lore.json`, com a data dela na
+agenda. `node tools/lore.mjs nova cap-xiii "O QUE ACONTECEU DEPOIS"` cria os
+dois — o arquivo nasce lacrado por uma semana, para dar tempo de escrever — e é
+só preencher o texto.
 
 Uma seção com o **mesmo `id`** de uma que já existe substitui a do launcher, o
 que serve para corrigir um nome ou reescrever um parágrafo. Um `id` novo entra
-no fim do arquivo. Se a seção nova deve abrir agora, acrescente
+no fim do documento. Se a seção nova deve abrir agora, acrescente
 `capitulo 13 = true` ao `capitulos.txt`; caso contrário, a agenda cuida da data.
+
+## Segurança do repositório
+
+A lore oficial e os mods só podem ser alterados por quem tem permissão de
+escrita no repositório. O launcher não tem como transformar um jogador em
+colaborador, e o editor de lore do launcher grava apenas um **rascunho local**
+no computador de quem está jogando: ele nunca altera este repositório.
+
+Para proteger o repositório no GitHub, o dono precisa configurar (o
+`CODEOWNERS` já está no projeto, mas ele só vale com esta configuração):
+
+- **Settings → Collaborators**: só quem realmente mantém o pacote recebe
+  permissão de escrita. Quem não é colaborador pode ler e abrir PR, mas não
+  consegue dar push.
+- **Settings → Branches → Add branch protection rule**, para `master`:
+  exigir pull request antes do merge, exigir revisão do code owner e impedir
+  force push e exclusão da branch.
+- **Settings → Tags → Add rule**, para `v*`: impedir que uma tag existente seja
+  movida ou apagada; release publicada não se reescreve.
+- **Settings → Actions → General**: deixar o `GITHUB_TOKEN` só com leitura por
+  padrão; o workflow de release já pede `contents: write` apenas quando roda.
+- **Settings → Secrets**: o token de publicação fica em segredo do repositório,
+  nunca no código, no `lore.json` ou em um `.txt`.
+
+O arquivo `.github/CODEOWNERS` marca `Mods/`, `Lore/`, `pack.json` e
+`.github/` como área do mantenedor. Sem a regra de branch protection, o GitHub
+não aplica o CODEOWNERS: ele é a segunda fechadura, não a primeira.
+
+Nunca aceite PR que mexa em `Mods/` sem conferir o jar, e não dê permissão de
+write para quem só precisa jogar. O jogador que quiser mudar a lore para si usa
+o editor local do launcher; a mudança não sai da máquina dele.
 
 ## O que o launcher faz com isso
 

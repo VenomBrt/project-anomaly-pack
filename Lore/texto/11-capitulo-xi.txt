@@ -1,0 +1,19 @@
+::entry 1948 | Fundação de River Pines. Um grupo de pioneiros liderado por Alfred Pines estabelece uma comunidade na ilha. A população inicial é registrada em oitenta e duas pessoas. As famílias constroem as primeiras residências e iniciam a construção do Hotel New Journey, destinado a receber viajantes e sustentar o futuro desenvolvimento turístico.
+
+::entry 1958 | Consolidação administrativa. River Pines registra cento e cinquenta e sete habitantes. A prefeitura é inaugurada oficialmente, e Alfred Pines funda o primeiro hospital independente da cidade. A comunidade torna-se conhecida pela hospitalidade dos moradores e pelo crescimento do turismo.
+
+::entry 1965 | Expansão e aumento da criminalidade. A população alcança trezentas e oitenta e cinco pessoas. Diante do aumento de furtos e atos de vandalismo, Alfred Pines e o xerife John Winter estabelecem uma delegacia dentro da prefeitura. Surgem denúncias sobre grupos que realizam encontros clandestinos na floresta e afirmam prestar devoção a uma entidade protetora.
+
+::entry 02/07/1967 | Massacre do Hotel New Journey. Sete indivíduos encapuzados invadem o hotel. O Tomorrow News registra aproximadamente vinte e oito hóspedes e dois funcionários mortos. Dois dos invasores também são encontrados mortos, em circunstâncias classificadas inicialmente como suicídio. A população registrada é de quatrocentas e vinte e seis pessoas.
+
+::entry 04/07/1967 | Encerramento do hotel. O proprietário do New Journey anuncia o fechamento do estabelecimento e solicita anonimato. Alfred Pines determina o fechamento temporário do aeroporto e estabelece um toque de recolher obrigatório. A população registrada cai para trezentas e oitenta e nove pessoas.
+
+::entry 06/07/1967 | Chamada de emergência e desaparecimentos. Uma chamada telefônica relata uma invasão domiciliar e termina abruptamente. Policiais encontram um homem que afirma ter provocado sozinho os sinais de confronto existentes na residência. O suspeito é apreendido, mas desaparece durante a madrugada seguinte, juntamente com os oficiais responsáveis pelo turno noturno. A população registrada é de trezentas e cinquenta e duas pessoas.
+
+::entry 26/09/1967 | Desaparecimento de Alfred Pines. O prefeito é declarado desaparecido. Na mesma tarde, indivíduos mascarados invadem a prefeitura e assumem o controle das estruturas administrativas e policiais. O grupo ameaça perseguir e matar aqueles que resistirem às suas ordens. A população registrada é de duzentas e setenta e duas pessoas.
+
+::entry 14/10/1967 | Intervenção militar. Helicópteros transportando soldados pousam no heliporto do New Journey. Os militares invadem a prefeitura, enfrentam os ocupantes e retomam o controle do edifício e de diferentes regiões da cidade. O Tomorrow News divulga a operação como uma libertação de River Pines. A população registrada é de cento e oitenta e nove pessoas.
+
+::entry 08/12/1967 | Ocupação militar e desaparecimentos. Os soldados assumem o controle das principais saídas, do hospital, da estação de energia e da prefeitura. Moradores relatam buscas domiciliares e a retirada de indivíduos que são conduzidos à floresta e não retornam. A identidade dos militares e a legitimidade de sua operação permanecem desconhecidas. O último registro jornalístico deixa a população em branco.
+
+::entry Após 08/12/1967 | Ausência de documentação confirmada. Não foram encontrados registros confiáveis que permitam estabelecer o destino da cidade, o número final de habitantes, o paradeiro dos desaparecidos ou a situação das forças que permaneceram na ilha.

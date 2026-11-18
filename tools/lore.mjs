@@ -14,12 +14,14 @@
  *   node tools/lore.mjs nova cap-xiii "O QUE ACONTECEU DEPOIS"
  *                                             cria uma seção para escrever
  */
-import { readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const FILE = join(ROOT, 'Lore', 'lore.json')
+const TEXT_DIR = join(ROOT, 'Lore', 'texto')
+const SAFE_ID = /^[a-z0-9-]+$/
 const DAY = /^(\d{4})-(\d{2})-(\d{2})$/
 
 const pad = (value) => String(value).padStart(2, '0')
@@ -101,25 +103,47 @@ function abrir(data, id, day) {
   })
 }
 
-function nova(data, id, title) {
+async function nova(data, id, title) {
   if (!id) throw new Error('diga o id da seção: node tools/lore.mjs nova cap-xiii "O TÍTULO"')
   if (!title) throw new Error('diga o título da seção entre aspas.')
+  if (!SAFE_ID.test(id)) {
+    throw new Error('use só letras minúsculas, números e hífen no id (ex.: cap-xiii).')
+  }
 
   const existentes = data.archive?.sections ?? []
   if (existentes.some((section) => section.id === id)) {
     throw new Error(`já existe uma seção com o id "${id}".`)
   }
 
+  const file = `texto/${id}.txt`
+  const target = join(ROOT, 'Lore', file)
+  try {
+    await readFile(target, 'utf8')
+    throw new Error(`o arquivo Lore/${file} já existe.`)
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error
+  }
+
+  await mkdir(TEXT_DIR, { recursive: true })
+  await writeFile(
+    target,
+    [
+      '::dateline RIVER PINES, 19__',
+      '',
+      '::source Registro arquivado pela prefeitura de River Pines.',
+      '',
+      '[ESCREVA AQUI]',
+      ''
+    ].join('\n'),
+    'utf8'
+  )
+
   const section = {
     id,
     numeral: null,
     title,
     source: 'arquivo',
-    blocks: [
-      { kind: 'dateline', text: 'RIVER PINES, 19__' },
-      { kind: 'source', text: 'Registro arquivado pela prefeitura de River Pines.' },
-      { kind: 'para', text: '[ESCREVA AQUI]' }
-    ]
+    file
   }
 
   data.archive = { ...(data.archive ?? { title: 'RIVER PINES: O ARQUIVO DOS DESAPARECIDOS', subtitle: '', source: '', sections: [] }) }
@@ -131,10 +155,9 @@ function nova(data, id, title) {
   const when = `${daqui.getFullYear()}-${pad(daqui.getMonth() + 1)}-${pad(daqui.getDate())}`
   data.liberacao = { ...agenda(data), [id]: when }
 
-  return save(data).then(() => {
-    console.log(`seção "${id}" criada em archive.sections, lacrada até ${when}.`)
-    console.log('escreva os blocos em Lore/lore.json e troque o "[ESCREVA AQUI]".')
-  })
+  await save(data)
+  console.log(`seção "${id}" criada em ${file}, lacrada até ${when}.`)
+  console.log('escreva o texto em Lore/texto/ e troque o "[ESCREVA AQUI]".')
 }
 
 async function main() {

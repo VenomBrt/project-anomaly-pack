@@ -1,0 +1,8 @@
+# Quem pode aprovar mudanças no que chega ao cliente do jogador.
+# O CODEOWNERS só é aplicado quando a branch protection estiver ligada.
+* @VenomBrt
+
+/Mods/ @VenomBrt
+/Lore/ @VenomBrt
+/pack.json @VenomBrt
+/.github/ @VenomBrt

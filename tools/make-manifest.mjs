@@ -15,7 +15,7 @@
  *   NoMods/      list.txt
  *   NoTexture/   list.txt
  *   Server/      server.json (address, port, autoJoin)
- *   Lore/        lore.json e capitulos.txt
+ *   Lore/        lore.json, capitulos.txt e os .txt de Lore/texto/
  *
  * Uso:
  *   node tools/make-manifest.mjs                      gera o manifest.json
@@ -27,6 +27,7 @@
  * Sai com código 1 quando há erro: nada é publicado com o pacote quebrado.
  */
 import { createHash } from 'node:crypto'
+import { existsSync } from 'node:fs'
 import { readFile, readdir, stat, writeFile } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -158,8 +159,15 @@ function checkLoreJson(text, path) {
     if (typeof section.title !== 'string' || section.title.trim().length === 0) {
       bad(`${where} precisa de "title".`)
     }
-    if (!Array.isArray(section.blocks) || section.blocks.length === 0) {
-      bad(`${where} precisa de "blocks" com pelo menos um bloco.`)
+    const file = typeof section.file === 'string' ? section.file.trim() : ''
+    if (file.length > 0) {
+      if (!isLoreTextPath(file)) {
+        bad(`${where}: "file" precisa ser um caminho como "texto/01-capitulo.txt".`)
+      } else if (!existsSync(join(ROOT, 'Lore', file))) {
+        bad(`${where}: o arquivo "Lore/${file}" não existe.`)
+      }
+    } else if (!Array.isArray(section.blocks) || section.blocks.length === 0) {
+      bad(`${where} precisa de "file" ou de "blocks" com pelo menos um bloco.`)
     }
     if (section.abrir !== undefined && !realDay(section.abrir)) {
       bad(`${where}: "abrir" tem "${section.abrir}". Use AAAA-MM-DD.`)
@@ -180,6 +188,15 @@ function realDay(value) {
     date.getDate() === Number(day)
   )
 }
+/** O índice só pode apontar para um texto dentro de Lore/texto/. */
+function isLoreTextPath(path) {
+  return (
+    path.startsWith('texto/') &&
+    path.endsWith('.txt') &&
+    path.split('/').every((part) => /^[A-Za-z0-9._-]+$/.test(part))
+  )
+}
+
 async function walk(dir, out, rule = RULES[dir]) {
   let entries
   try {
@@ -202,7 +219,7 @@ async function walk(dir, out, rule = RULES[dir]) {
     }
     if (!entry.isFile()) continue
 
-    if (rule.only && !rule.only.includes(entry.name)) {
+    if (rule.only && !rule.only.includes(entry.name) && !isLoreText(root, path)) {
       warn(`${path}: ignorado. A pasta ${root}/ só lê ${rule.only.join(', ')}.`)
       continue
     }
@@ -243,6 +260,11 @@ async function walk(dir, out, rule = RULES[dir]) {
       size: info.size
     })
   }
+}
+
+/** Um texto da lore não é um arquivo solto na raiz: fica em Lore/texto/. */
+function isLoreText(root, path) {
+  return root === 'Lore' && isLoreTextPath(path.slice('Lore/'.length))
 }
 
 function report() {
