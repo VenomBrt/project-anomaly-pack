@@ -9,3 +9,5 @@
 #
 # Um nome por linha. O "@" é opcional. Linhas com "#" são comentários.
 VenomBrt
+
+# teste de publicação real do Worker em 2026-11-19 — não é um editor
