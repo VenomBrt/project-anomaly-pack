@@ -22,6 +22,10 @@ concurrency:
 
 jobs:
   publicar:
+    # A fonte editorial é privada e não precisa de release própria; quem serve
+    # os launchers antigos é o espelho público. O mesmo arquivo fica nos dois
+    # repositórios, mas só o espelho publica.
+    if: github.repository == 'VenomBrt/project-anomaly-pack'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
