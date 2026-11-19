@@ -28,7 +28,7 @@ digitais e baixa só o que mudou. Quem já está jogando recebe no próximo cliq
 | `Forcepack/` | Packs de textura forçados (`.zip` com `pack.mcmeta`). Vão para `resourcepacks/` e para o topo do `options.txt` — ninguém consegue desligar. |
 | `NoTexture/` | `list.txt` com packs proibidos. O launcher apaga o arquivo e tira do `options.txt`. |
 | `Server/` | `server.json` com `address`, `port` e `autoJoin`. Com `autoJoin: true`, o jogo abre já entrando no servidor. |
-| `Lore/` | `lore.json` é o **índice** do Arquivo (título, ordem, censo dos estágios, agenda); `Lore/texto/*.txt` é o texto de cada seção; `capitulos.txt` é o estado explícito de quais capítulos estão abertos. |
+| `Lore/` | `lore.json` é o **índice** do Arquivo (título, ordem, censo dos estágios); `Lore/texto/*.txt` é o texto de cada seção; `capitulos.txt` é a lista explícita de quais capítulos estão abertos; `editores.txt` lista quem pode publicar a lore. |
 
 O pacote inclui `CustomSkinLoader_ForgeV2-14.28.jar` para as skins offline. O
 launcher grava a skin escolhida em
@@ -64,6 +64,11 @@ viram conteúdo do pacote.
 O Actions gera o `manifest.json` — nome, versão e SHA-1 de cada arquivo — e anexa
 à release. É esse manifest que o launcher lê: sem ele, nada é aplicado.
 
+**Mudança só de lore:** não precisa de tag nem de subir a versão. Qualquer push
+em `Lore/` dispara o workflow `publicar lore`, que confere quem enviou, gera o
+manifest e publica uma release `lore-*`. O launcher pega a release mais recente e
+aplica o novo `capitulos.txt`, `lore.json` e textos na próxima sincronização.
+
 Dá para publicar sem tag: **Actions → release → Run workflow**, informando a tag.
 Se preferir sem Actions, rode `node tools/make-manifest.mjs`, crie a release na
 mão e anexe o `manifest.json` gerado.
@@ -75,6 +80,9 @@ mão e anexe o `manifest.json` gerado.
 - **`release`** roda quando entra uma tag `v*`: confere o pacote mais uma vez,
   **exige que a tag bata com a `version` do `pack.json`** e publica a release com
   o `manifest.json` anexado.
+- **`publicar lore`** roda a cada push em `Lore/`: confere se quem enviou está
+  em `Lore/editores.txt`, valida o pacote e publica uma release `lore-*` com o
+  manifest. Não exige tag nem versão nova.
 
 Para conferir na sua máquina (opcional, precisa de Node 20+):
 `node tools/make-manifest.mjs --check`.
@@ -104,9 +112,6 @@ O índice do Arquivo e/ou os números dos estágios. A seção não guarda o tex
   "stages": {
     "1948": { "stamp": "1948", "population": 82 },
     "1967": { "stamp": "02/07/1967", "population": 426 }
-  },
-  "liberacao": {
-    "novo-capitulo": "2026-11-22"
   },
   "archive": {
     "title": "RIVER PINES: O ARQUIVO DOS DESAPARECIDOS",
@@ -138,8 +143,10 @@ lore no GitHub, abra o `.txt` da seção (o capítulo I é
 `Lore/texto/01-capitulo-i.txt`) e escreva. O `lore.json` só precisa do `file`
 com o nome do arquivo.
 
-O formato é texto comum, uma linha por bloco. Quando a linha tem um papel
-especial, comece com um marcador:
+O formato é texto comum. Um parágrafo pode ser quebrado em várias linhas para
+ficar legível no Git: linhas seguidas, sem linha vazia no meio, são lidas como
+um parágrafo só. Uma linha vazia separa um bloco do próximo. Quando o bloco tem
+um papel especial, comece com um marcador:
 
 ```txt
 ::dateline RIVER PINES, 1967
@@ -158,7 +165,8 @@ O texto do parágrafo vem assim, direto, sem marcador.
 Marcadores: `title`, `dateline`, `source`, `head`, `para`, `transcript` e
 `entry` (a data vem antes do `|`). Sem marcador, o leitor reconhece data, fonte,
 transcrição, item de cronologia e título em maiúsculas; o resto é parágrafo.
-Linhas vazias e linhas que começam com `#` são ignoradas.
+Linhas vazias separam blocos. Linhas que começam com `#` são comentários e não
+entram no documento.
 
 **Para entrar no Arquivo, o arquivo precisa estar no índice.** Criar
 `Lore/texto/cap-xiii.txt` não basta: acrescente uma seção em
@@ -168,60 +176,50 @@ repositório.
 
 ## A lore abre por partes
 
-A lore não chega toda de uma vez. Cada seção do Arquivo tem um dia de liberação:
-antes disso ela aparece **lacrada** na tela — o número, o selo e a data, sem o
-texto. A agenda `liberacao` do `Lore/lore.json` abre pelas datas; o
-`Lore/capitulos.txt` é a lista explícita que vence a agenda quando precisar
-abrir ou fechar uma seção fora do dia.
-
-```json
-"liberacao": {
-  "nota-introdutória-sobre-a-integridade-dos-documentos": "2026-11-01",
-  "i": "2026-11-01",
-  "iv": "2026-11-22"
-}
-```
-
-O `capitulos.txt` é opcional; quando existe, manda:
+A liberação é **manual**. Nada abre por data: o `Lore/capitulos.txt` é a única
+chave, e quem decide o momento é a equipe.
 
 ```txt
 introducao = true
 capitulo 1 = true
+capitulo 2 = true
+capitulo 3 = true
+capitulo 4 = false
+encerramento = false
 ```
 
-`true` abre e `false` fecha, mesmo que a agenda diga outra coisa. Sem uma linha
-explícita e sem data, a seção fica lacrada.
+- `true` abre; `false` deixa o capítulo no índice, **lacrado**, sem o texto.
+- Capítulo fora da lista fica lacrado. Nada abre por omissão.
+- O nome aceita variações: `capitulo 1`, `Capítulo 1`, `cap 1`, `capitulo I`.
+  A abertura é `introducao` e o fecho é `encerramento`.
+- Para abrir um capítulo, troque `false` por `true` e envie a mudança. O workflow
+  `publicar lore` gera o manifest e publica a release sozinho; o launcher
+  recebe na próxima sincronização.
 
-- **O id é o da seção.** As que vêm dentro do launcher são
-  `nota-introdutória-sobre-a-integridade-dos-documentos`, `i`, `ii`, `iii`, `iv`,
-  `v`, `vi`, `vii`, `viii`, `ix`, `x`, `xi`, `xii` e `declaração-de-encerramento`.
-- **Sem data e sem lista, a seção está lacrada.** Id que não existe é ignorado —
-  o pacote pode ser mais novo que o launcher.
-- **A data é local e vira à meia-noite.** `2026-11-08` abre no dia 8, para todo
-  mundo, sem ninguém precisar baixar nada de novo.
-- **A agenda viaja junto com a release.** Depois de mexer, suba a `version` do
-  `pack.json` e publique a tag; a partir daí as aberturas acontecem sozinhas.
+Quem pode publicar está em `Lore/editores.txt`. O workflow confere o usuário do
+GitHub que enviou a mudança e só publica a release se ele estiver na lista. As
+permissões do GitHub continuam sendo a fechadura principal: sem permissão de
+escrita, não existe push para começar.
 
-Para ver a agenda de hoje em diante (opcional, precisa de Node 20+):
+Para conferir ou mudar pelo terminal (opcional, precisa de Node 20+):
 
 ```
-node tools/lore.mjs                       # a agenda
-node tools/lore.mjs abrir iv              # abre agora
-node tools/lore.mjs abrir iv 2026-11-22   # agenda para o dia 22
+node tools/lore.mjs                       # o estado de cada capítulo
+node tools/lore.mjs abrir iv              # abre o capítulo IV
+node tools/lore.mjs fechar iv             # lacra o capítulo IV
 ```
 
 ### Escrever lore nova
 
 Lore nova não precisa de launcher novo: crie o `.txt` em `Lore/texto/` e
-acrescente a seção em `archive.sections` do `Lore/lore.json`, com a data dela na
-agenda. `node tools/lore.mjs nova cap-xiii "O QUE ACONTECEU DEPOIS"` cria os
-dois — o arquivo nasce lacrado por uma semana, para dar tempo de escrever — e é
-só preencher o texto.
+acrescente a seção em `archive.sections` do `Lore/lore.json`, com `file`
+apontando para o texto. `node tools/lore.mjs nova cap-xiii "O QUE ACONTECEU
+DEPOIS"` cria os dois — o arquivo nasce lacrado e só abre quando a equipe
+colocar `capitulo 13 = true` no `capitulos.txt`.
 
 Uma seção com o **mesmo `id`** de uma que já existe substitui a do launcher, o
 que serve para corrigir um nome ou reescrever um parágrafo. Um `id` novo entra
-no fim do documento. Se a seção nova deve abrir agora, acrescente
-`capitulo 13 = true` ao `capitulos.txt`; caso contrário, a agenda cuida da data.
+no fim do documento.
 
 ## Segurança do repositório
 
@@ -229,6 +227,11 @@ A lore oficial e os mods só podem ser alterados por quem tem permissão de
 escrita no repositório. O launcher não tem como transformar um jogador em
 colaborador, e o editor de lore do launcher grava apenas um **rascunho local**
 no computador de quem está jogando: ele nunca altera este repositório.
+
+O repositório do pacote **precisa continuar público**. Os launchers já
+instalados leem esta URL sem login; se ela virar privada, eles param de baixar
+o pacote e não têm como ser redirecionados para outro lugar. O que protege a
+edição não é a visibilidade: é quem tem `write`.
 
 Para proteger o repositório no GitHub, o dono precisa configurar (o
 `CODEOWNERS` já está no projeto, mas ele só vale com esta configuração):
@@ -240,15 +243,21 @@ Para proteger o repositório no GitHub, o dono precisa configurar (o
   exigir pull request antes do merge, exigir revisão do code owner e impedir
   force push e exclusão da branch.
 - **Settings → Tags → Add rule**, para `v*`: impedir que uma tag existente seja
-  movida ou apagada; release publicada não se reescreve.
+  movida ou apagada; release publicada não se reescreve. As tags `lore-*` da
+  publicação automática não entram nessa regra.
 - **Settings → Actions → General**: deixar o `GITHUB_TOKEN` só com leitura por
-  padrão; o workflow de release já pede `contents: write` apenas quando roda.
-- **Settings → Secrets**: o token de publicação fica em segredo do repositório,
-  nunca no código, no `lore.json` ou em um `.txt`.
+  padrão; os workflows de release já pedem `contents: write` apenas quando
+  rodam.
 
 O arquivo `.github/CODEOWNERS` marca `Mods/`, `Lore/`, `pack.json` e
 `.github/` como área do mantenedor. Sem a regra de branch protection, o GitHub
 não aplica o CODEOWNERS: ele é a segunda fechadura, não a primeira.
+
+`Lore/editores.txt` é a lista de quem pode transformar uma edição de lore em
+release. Ela não substitui as permissões do GitHub: um colaborador com `write`
+já consegue editar o arquivo. O workflow usa a lista para deixar explícito quem
+da equipe publica; para uma barreira de verdade, o caminho é um backend com
+GitHub App, que não dá `write` a ninguém fora da lista.
 
 Nunca aceite PR que mexa em `Mods/` sem conferir o jar, e não dê permissão de
 write para quem só precisa jogar. O jogador que quiser mudar a lore para si usa

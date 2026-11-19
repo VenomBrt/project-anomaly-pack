@@ -1,0 +1,59 @@
+name: publicar lore
+
+# Qualquer mudança em Lore/ vira uma release nova sem ninguém precisar criar
+# tag ou subir a versão do pack.json. O launcher consulta a release mais
+# recente; o manifest anexado leva o novo capitulos.txt, lore.json e textos.
+#
+# A release só sai se quem enviou estiver em Lore/editores.txt. As permissões
+# do GitHub continuam sendo a fechadura principal: sem write, não há push.
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - 'Lore/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar-lore
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Conferir quem está publicando
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: node tools/check-editors.mjs
+
+      - name: Conferir o pacote
+        run: node tools/make-manifest.mjs --check
+
+      - name: Gerar o manifest
+        run: node tools/make-manifest.mjs
+
+      - name: Definir a tag da publicação
+        id: tag
+        shell: bash
+        run: echo "name=lore-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+
+      - name: Publicar a release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          name: 'Lore — ${{ steps.tag.outputs.name }}'
+          body: |
+            Publicação automática da lore a partir de ${{ github.sha }}.
+            O launcher recebe estes arquivos na próxima sincronização.
+          files: manifest.json
+          generate_release_notes: false
+          make_latest: true

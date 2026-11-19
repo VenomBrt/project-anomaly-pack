@@ -1,117 +1,174 @@
 #!/usr/bin/env node
 /*
- * A agenda da lore.
+ * O painel de liberação da lore.
  *
- * A lore do launcher abre por partes: cada seção do Arquivo tem um dia, e o que
- * ainda não chegou aparece lacrado na tela. Este script só mexe nesse bloco do
- * `Lore/lore.json` — nada aqui publica nada, e a agenda vale depois da próxima
- * release, como qualquer outra edição do pacote.
+ * A lore do launcher abre por partes, mas quem decide o dia é a equipe: não há
+ * agenda automática. A chave é `Lore/capitulos.txt` — `true` abre, `false`
+ * lacra. Este script lê e escreve esse arquivo, e ajuda a criar uma seção nova.
  *
  * Uso:
- *   node tools/lore.mjs                       a agenda de hoje em diante
- *   node tools/lore.mjs abrir iv              libera a seção IV agora
- *   node tools/lore.mjs abrir iv 2026-11-22   agenda a seção IV para o dia 22
+ *   node tools/lore.mjs                       o estado de cada capítulo
+ *   node tools/lore.mjs abrir iv              abre o capítulo IV
+ *   node tools/lore.mjs fechar iv             lacra o capítulo IV
  *   node tools/lore.mjs nova cap-xiii "O QUE ACONTECEU DEPOIS"
- *                                             cria uma seção para escrever
+ *                                             cria uma seção nova, lacrada
+ *
+ * Depois de mexer, é só enviar a mudança. O workflow `publicar lore` gera o
+ * manifest e publica a release; o launcher recebe na próxima sincronização.
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const FILE = join(ROOT, 'Lore', 'lore.json')
+const LORE = join(ROOT, 'Lore', 'lore.json')
+const CHAPTERS = join(ROOT, 'Lore', 'capitulos.txt')
 const TEXT_DIR = join(ROOT, 'Lore', 'texto')
 const SAFE_ID = /^[a-z0-9-]+$/
-const DAY = /^(\d{4})-(\d{2})-(\d{2})$/
 
-const pad = (value) => String(value).padStart(2, '0')
-const today = () => {
-  const now = new Date()
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+const ROMAN = { i: 1, v: 5, x: 10, l: 50, c: 100, d: 500, m: 1000 }
+const ALIASES = {
+  'nota introdutoria sobre a integridade dos documentos': 'introducao',
+  intro: 'introducao',
+  nota: 'introducao',
+  'declaracao de encerramento': 'encerramento'
 }
 
-/** A data existe no calendário? 31 de fevereiro não existe. */
-function realDay(value) {
-  const match = typeof value === 'string' ? DAY.exec(value.trim()) : null
-  if (!match) return null
-  const [, year, month, day] = match
-  const date = new Date(Number(year), Number(month) - 1, Number(day))
-  const ok =
-    date.getFullYear() === Number(year) &&
-    date.getMonth() === Number(month) - 1 &&
-    date.getDate() === Number(day)
-  return ok ? `${year}-${month}-${day}` : null
-}
+const plain = (text) =>
+  String(text ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
 
-const daysBetween = (from, to) => Math.round((new Date(to) - new Date(from)) / 86_400_000)
-
-async function load() {
-  return JSON.parse(await readFile(FILE, 'utf8'))
-}
-
-async function save(data) {
-  await writeFile(FILE, `${JSON.stringify(data, null, 2)}\n`, 'utf8')
-}
-
-function agenda(data) {
-  return data.liberacao && typeof data.liberacao === 'object' ? data.liberacao : {}
-}
-
-/** A lista da agenda, do dia mais próximo para o mais distante. */
-function status(data) {
-  const entries = Object.entries(agenda(data)).sort((a, b) => String(a[1]).localeCompare(String(b[1])))
-  const now = today()
-
-  if (entries.length === 0) {
-    console.log('agenda vazia: toda a lore que o launcher conhece está aberta.')
-  } else {
-    console.log(`agenda da lore — hoje é ${now}\n`)
-    for (const [id, day] of entries) {
-      const date = realDay(day)
-      if (!date) {
-        console.log(`  !!  ${id}: "${day}" não é uma data (use AAAA-MM-DD)`)
-        continue
-      }
-      const restam = daysBetween(now, date)
-      const estado =
-        restam > 0 ? `lacrada · abre em ${restam} dia${restam === 1 ? '' : 's'}` : 'aberta'
-      console.log(`  ${date}  ${id}  —  ${estado}`)
-    }
-
-    const abertas = entries.filter(([, day]) => realDay(day) && realDay(day) <= now).length
-    console.log(`\n${abertas} de ${entries.length} seções liberadas.`)
+function romanToNumber(text) {
+  let total = 0
+  const letters = String(text ?? '').toLowerCase()
+  for (let index = 0; index < letters.length; index += 1) {
+    const value = ROMAN[letters[index]]
+    if (!value) return 0
+    const next = ROMAN[letters[index + 1]] ?? 0
+    total += value < next ? -value : value
   }
-
-  const extras = (data.archive?.sections ?? []).map((section) => section.id).filter(Boolean)
-  if (extras.length > 0) {
-    console.log(`\nlore nova neste pacote: ${extras.join(', ')}`)
-  }
-  console.log('\nlembre: só chega ao jogador depois de subir a "version" do pack.json e publicar a tag.')
+  return total
 }
 
-function abrir(data, id, day) {
-  if (!id) throw new Error('diga qual seção: node tools/lore.mjs abrir iv')
-  const when = day ? realDay(day) : today()
-  if (!when) throw new Error(`"${day}" não é uma data. Use AAAA-MM-DD, ex.: 2026-11-22.`)
+/** O nome que o `capitulos.txt` usa para uma seção. */
+function chapterKey(raw) {
+  const text = plain(raw).replace(/[\s_-]+/g, ' ')
+  if (ALIASES[text]) return ALIASES[text]
+  const match = /^(?:(?:cap|capitulo|chapter)\s*)?(\d+|[ivxlcdm]+)$/.exec(text)
+  if (match) {
+    const token = match[1]
+    const number = /^\d+$/.test(token) ? Number(token) : romanToNumber(token)
+    if (number > 0) return `capitulo ${number}`
+  }
+  return text.replace(/[\s_]+/g, '-')
+}
 
-  data.liberacao = { ...agenda(data), [id]: when }
-  return save(data).then(() => {
-    const restam = daysBetween(today(), when)
-    if (restam > 0) console.log(`${id}: lacrada até ${when} (${restam} dia${restam === 1 ? '' : 's'}).`)
-    else console.log(`${id}: aberta a partir de ${when}.`)
-    console.log('suba a "version" do pack.json e publique a tag para isso valer no launcher.')
+function chapterOrder(key) {
+  if (key === 'introducao') return -1
+  if (key === 'encerramento') return 10_000
+  const match = /^capitulo\s+(\d+)$/.exec(key)
+  return match ? Number(match[1]) : 2_000
+}
+
+function parseChapters(text) {
+  const chapters = new Map()
+  text.split(/\r?\n/).forEach((line) => {
+    const content = line.replace(/#.*/, '').trim()
+    if (content.length === 0) return
+    const split = content.search(/[=:]/)
+    if (split === -1) return
+    const key = chapterKey(content.slice(0, split).trim())
+    const value = plain(content.slice(split + 1))
+    chapters.set(key, ['true', 'sim', 's', '1', 'aberto', 'aberta', 'liberado', 'liberada', 'on', 'yes'].includes(value))
   })
+  return chapters
 }
 
-async function nova(data, id, title) {
+function serializeChapters(chapters) {
+  const keys = [...chapters.keys()].sort((a, b) => {
+    const order = chapterOrder(a) - chapterOrder(b)
+    return order !== 0 ? order : a.localeCompare(b)
+  })
+  return [
+    '# O launcher lê este arquivo para saber o que já pode ser lido.',
+    '# true = aberto; false = lacrado. A lista é a única chave: não há agenda.',
+    '#',
+    '# Só o dono e os admins do repositório publicam mudanças aqui. Para abrir um',
+    '# capítulo, troque o false por true e envie; a release automática cuida do',
+    '# resto e todos os launchers recebem na próxima sincronização.',
+    '',
+    ...keys.map((key) => `${key} = ${chapters.get(key) ? 'true' : 'false'}`),
+    ''
+  ].join('\n')
+}
+
+async function loadChapters() {
+  try {
+    return parseChapters(await readFile(CHAPTERS, 'utf8'))
+  } catch {
+    return new Map()
+  }
+}
+
+async function saveChapters(chapters) {
+  await writeFile(CHAPTERS, serializeChapters(chapters), 'utf8')
+}
+
+async function loadLore() {
+  return JSON.parse(await readFile(LORE, 'utf8'))
+}
+
+async function saveLore(data) {
+  await writeFile(LORE, `${JSON.stringify(data, null, 2)}\n`, 'utf8')
+}
+
+function sectionKey(section) {
+  return chapterKey(section.numeral && romanToNumber(section.numeral) > 0 ? section.numeral : section.id)
+}
+
+async function status() {
+  const data = await loadLore()
+  const chapters = await loadChapters()
+  const sections = data.archive?.sections ?? []
+
+  console.log('liberação da lore — sem agenda; quem abre é a equipe\n')
+  for (const section of sections) {
+    const key = sectionKey(section)
+    const open = chapters.get(key) === true
+    console.log(`  ${open ? 'aberto ' : 'lacrado'}  ${key.padEnd(14)} ${section.title ?? section.id}`)
+  }
+
+  const known = new Set(sections.map(sectionKey))
+  const extra = [...chapters.keys()].filter((key) => !known.has(key))
+  if (extra.length > 0) {
+    console.log(`\nfora do índice (ignorado pelo launcher): ${extra.join(', ')}`)
+  }
+  console.log('\nlembre: envie a mudança; o workflow publica a release sozinho.')
+}
+
+async function setChapter(id, open) {
+  if (!id) throw new Error('diga qual capítulo: node tools/lore.mjs abrir iv')
+  const chapters = await loadChapters()
+  const key = chapterKey(id)
+  chapters.set(key, open)
+  await saveChapters(chapters)
+  console.log(`${key}: ${open ? 'aberto' : 'lacrado'}.`)
+  console.log('envie a mudança; o workflow publica a release sozinho.')
+}
+
+async function newSection(id, title) {
   if (!id) throw new Error('diga o id da seção: node tools/lore.mjs nova cap-xiii "O TÍTULO"')
   if (!title) throw new Error('diga o título da seção entre aspas.')
   if (!SAFE_ID.test(id)) {
     throw new Error('use só letras minúsculas, números e hífen no id (ex.: cap-xiii).')
   }
 
-  const existentes = data.archive?.sections ?? []
-  if (existentes.some((section) => section.id === id)) {
+  const data = await loadLore()
+  const existing = data.archive?.sections ?? []
+  if (existing.some((section) => section.id === id)) {
     throw new Error(`já existe uma seção com o id "${id}".`)
   }
 
@@ -127,48 +184,37 @@ async function nova(data, id, title) {
   await mkdir(TEXT_DIR, { recursive: true })
   await writeFile(
     target,
-    [
-      '::dateline RIVER PINES, 19__',
-      '',
-      '::source Registro arquivado pela prefeitura de River Pines.',
-      '',
-      '[ESCREVA AQUI]',
-      ''
-    ].join('\n'),
+    ['::dateline RIVER PINES, 19__', '', '::source Registro arquivado pela prefeitura de River Pines.', '', '[ESCREVA AQUI]', ''].join('\n'),
     'utf8'
   )
 
-  const section = {
-    id,
-    numeral: null,
-    title,
-    source: 'arquivo',
-    file
+  const section = { id, numeral: null, title, source: 'arquivo', file }
+  data.archive = {
+    ...(data.archive ?? {
+      title: 'RIVER PINES: O ARQUIVO DOS DESAPARECIDOS',
+      subtitle: '',
+      source: '',
+      sections: []
+    })
   }
+  data.archive.sections = [...existing, section]
+  await saveLore(data)
 
-  data.archive = { ...(data.archive ?? { title: 'RIVER PINES: O ARQUIVO DOS DESAPARECIDOS', subtitle: '', source: '', sections: [] }) }
-  data.archive.sections = [...existentes, section]
+  const chapters = await loadChapters()
+  chapters.set(chapterKey(id), false)
+  await saveChapters(chapters)
 
-  // Nasce lacrada por uma semana: dá tempo de escrever antes de alguém ler.
-  const daqui = new Date()
-  daqui.setDate(daqui.getDate() + 7)
-  const when = `${daqui.getFullYear()}-${pad(daqui.getMonth() + 1)}-${pad(daqui.getDate())}`
-  data.liberacao = { ...agenda(data), [id]: when }
-
-  await save(data)
-  console.log(`seção "${id}" criada em ${file}, lacrada até ${when}.`)
+  console.log(`seção "${id}" criada em ${file} e lacrada.`)
   console.log('escreva o texto em Lore/texto/ e troque o "[ESCREVA AQUI]".')
 }
 
 async function main() {
   const [command, ...rest] = process.argv.slice(2)
-  const data = await load()
-
-  if (!command || command === 'status') return status(data)
-  if (command === 'abrir') return abrir(data, rest[0], rest[1])
-  if (command === 'nova') return nova(data, rest[0], rest.slice(1).join(' '))
-
-  console.log('comandos: status · abrir <id> [data] · nova <id> "<título>"')
+  if (!command || command === 'status') return status()
+  if (command === 'abrir') return setChapter(rest[0], true)
+  if (command === 'fechar') return setChapter(rest[0], false)
+  if (command === 'nova') return newSection(rest[0], rest.slice(1).join(' '))
+  console.log('comandos: status · abrir <id> · fechar <id> · nova <id> "<título>"')
 }
 
 main().catch((error) => {

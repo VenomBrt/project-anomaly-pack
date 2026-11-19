@@ -2,10 +2,85 @@
 
 ::source Registro registrado pelo escrivão da prefeitura de River Pines.
 
-A história documentada de River Pines tem início em 1948, quando um pequeno grupo de pioneiros, composto majoritariamente por camponeses, trabalhadores rurais e famílias que buscavam recomeçar suas vidas longe dos centros urbanos, estabeleceu-se em uma ilha isolada situada ao sul da costa de uma região cuja identificação geográfica não foi preservada. Os documentos originais mencionam que os fundadores partiram da cidade de [NOME SUPRIMIDO], localizada na região de [LOCALIZAÇÃO SUPRIMIDA], abandonando suas antigas residências em busca de condições mais favoráveis de sobrevivência, autonomia econômica e estabilidade social. O período que sucedeu a Segunda Guerra Mundial havia deixado marcas profundas na população de diversas localidades, e a região de origem dos pioneiros não parecia constituir uma exceção. As dificuldades econômicas, a escassez de oportunidades, as perdas familiares e as consequências sociais de um conflito que havia terminado apenas três anos antes foram apontadas como alguns dos fatores que motivaram a expedição. Diferentemente de outros grupos migratórios que procuravam cidades maiores, os pioneiros de River Pines pretendiam estabelecer uma comunidade própria, relativamente independente das autoridades externas e capaz de sustentar seus habitantes por meio da agricultura, da pesca, do comércio local e da exploração responsável dos recursos naturais da ilha. A expedição foi conduzida por Alfred Pines, indivíduo posteriormente reconhecido como fundador e primeiro prefeito da cidade. Os registros disponíveis não esclarecem se Alfred já exercia algum cargo administrativo antes da viagem, mas indicam que ele foi responsável por organizar os recursos, distribuir as primeiras tarefas e estabelecer as regras que orientariam a convivência entre as famílias durante os meses iniciais de ocupação.
+A história documentada de River Pines tem início em 1948, quando um pequeno grupo de
+pioneiros, composto majoritariamente por camponeses, trabalhadores rurais e famílias que
+buscavam recomeçar suas vidas longe dos centros urbanos, estabeleceu-se em uma ilha isolada
+situada ao sul da costa de uma região cuja identificação geográfica não foi preservada. Os
+documentos originais mencionam que os fundadores partiram da cidade de [NOME SUPRIMIDO],
+localizada na região de [LOCALIZAÇÃO SUPRIMIDA], abandonando suas antigas residências em
+busca de condições mais favoráveis de sobrevivência, autonomia econômica e estabilidade
+social. O período que sucedeu a Segunda Guerra Mundial havia deixado marcas profundas na
+população de diversas localidades, e a região de origem dos pioneiros não parecia constituir
+uma exceção. As dificuldades econômicas, a escassez de oportunidades, as perdas familiares e
+as consequências sociais de um conflito que havia terminado apenas três anos antes foram
+apontadas como alguns dos fatores que motivaram a expedição. Diferentemente de outros grupos
+migratórios que procuravam cidades maiores, os pioneiros de River Pines pretendiam
+estabelecer uma comunidade própria, relativamente independente das autoridades externas e
+capaz de sustentar seus habitantes por meio da agricultura, da pesca, do comércio local e da
+exploração responsável dos recursos naturais da ilha. A expedição foi conduzida por Alfred
+Pines, indivíduo posteriormente reconhecido como fundador e primeiro prefeito da cidade. Os
+registros disponíveis não esclarecem se Alfred já exercia algum cargo administrativo antes
+da viagem, mas indicam que ele foi responsável por organizar os recursos, distribuir as
+primeiras tarefas e estabelecer as regras que orientariam a convivência entre as famílias
+durante os meses iniciais de ocupação.
 
-A escolha da ilha não parece ter sido acidental. Embora isolada e relativamente distante das rotas comerciais convencionais, a região apresentava áreas de solo fértil, disponibilidade de água doce e uma extensa cobertura florestal que oferecia madeira para construção e recursos para a subsistência. Um curso de água atravessava parte do território habitável, contornando terrenos baixos e seguindo em direção ao litoral. Foi a presença desse rio, associada à vegetação abundante e à possibilidade de estabelecer construções próximas à margem, que contribuiu para a escolha do nome River Pines. Os documentos não oferecem uma explicação definitiva sobre a origem da segunda parte do nome, embora algumas anotações posteriores indiquem a presença de grandes pinheiros ao longo das áreas mais elevadas da ilha. A primeira impressão registrada pelos colonos descreve um território silencioso, verdejante e aparentemente adequado à construção de uma comunidade permanente. A floresta, no entanto, ocupava uma extensão muito superior à área inicialmente desmatada, e sua profundidade tornava impossível determinar, com os recursos disponíveis na época, a totalidade de seu território. Algumas famílias relataram dificuldades para se orientar durante as primeiras incursões, sobretudo em dias de neblina, quando os caminhos recém-abertos desapareciam entre as árvores e os sons produzidos pela água pareciam se propagar por distâncias maiores do que seria esperado. Tais relatos não receberam atenção especial na documentação administrativa daquele período, sendo considerados dificuldades comuns a qualquer processo de colonização de uma região florestal.
+A escolha da ilha não parece ter sido acidental. Embora isolada e relativamente distante das
+rotas comerciais convencionais, a região apresentava áreas de solo fértil, disponibilidade
+de água doce e uma extensa cobertura florestal que oferecia madeira para construção e
+recursos para a subsistência. Um curso de água atravessava parte do território habitável,
+contornando terrenos baixos e seguindo em direção ao litoral. Foi a presença desse rio,
+associada à vegetação abundante e à possibilidade de estabelecer construções próximas à
+margem, que contribuiu para a escolha do nome River Pines. Os documentos não oferecem uma
+explicação definitiva sobre a origem da segunda parte do nome, embora algumas anotações
+posteriores indiquem a presença de grandes pinheiros ao longo das áreas mais elevadas da
+ilha. A primeira impressão registrada pelos colonos descreve um território silencioso,
+verdejante e aparentemente adequado à construção de uma comunidade permanente. A floresta,
+no entanto, ocupava uma extensão muito superior à área inicialmente desmatada, e sua
+profundidade tornava impossível determinar, com os recursos disponíveis na época, a
+totalidade de seu território. Algumas famílias relataram dificuldades para se orientar
+durante as primeiras incursões, sobretudo em dias de neblina, quando os caminhos
+recém-abertos desapareciam entre as árvores e os sons produzidos pela água pareciam se
+propagar por distâncias maiores do que seria esperado. Tais relatos não receberam atenção
+especial na documentação administrativa daquele período, sendo considerados dificuldades
+comuns a qualquer processo de colonização de uma região florestal.
 
-Os primeiros meses foram marcados por trabalho intenso. As famílias construíram abrigos provisórios, abriram clareiras para o cultivo, estabeleceram pontos de armazenamento de alimentos e organizaram pequenas áreas destinadas à criação de animais. A madeira extraída da floresta foi empregada na construção das primeiras residências, de depósitos e de estruturas comunitárias. Os trabalhadores mais experientes assumiram a responsabilidade de orientar as construções, enquanto os demais habitantes se dividiram entre a agricultura, a pesca, a manutenção dos caminhos e a preparação dos terrenos destinados à futura expansão urbana. Não havia uma divisão rígida entre trabalho público e privado: grande parte das construções iniciais foi erguida por meio de esforço coletivo, com famílias oferecendo ferramentas, alimentos e mão de obra para garantir que ninguém permanecesse sem abrigo. Essa prática tornou-se um dos princípios culturais mais associados à identidade inicial de River Pines. Os habitantes passaram a reconhecer a comunidade como uma oportunidade de escapar das dificuldades que haviam enfrentado no continente, e a cooperação era frequentemente apresentada por Alfred como a principal garantia de sobrevivência da cidade. A população inicial registrada era de oitenta e duas pessoas, número que incluía adultos, idosos e crianças. Apesar das limitações materiais, o grupo conseguiu estabelecer uma estrutura habitacional funcional e iniciou o planejamento de uma construção que se tornaria o principal símbolo da cidade durante suas primeiras décadas.
+Os primeiros meses foram marcados por trabalho intenso. As famílias construíram abrigos
+provisórios, abriram clareiras para o cultivo, estabeleceram pontos de armazenamento de
+alimentos e organizaram pequenas áreas destinadas à criação de animais. A madeira extraída
+da floresta foi empregada na construção das primeiras residências, de depósitos e de
+estruturas comunitárias. Os trabalhadores mais experientes assumiram a responsabilidade de
+orientar as construções, enquanto os demais habitantes se dividiram entre a agricultura, a
+pesca, a manutenção dos caminhos e a preparação dos terrenos destinados à futura expansão
+urbana. Não havia uma divisão rígida entre trabalho público e privado: grande parte das
+construções iniciais foi erguida por meio de esforço coletivo, com famílias oferecendo
+ferramentas, alimentos e mão de obra para garantir que ninguém permanecesse sem abrigo. Essa
+prática tornou-se um dos princípios culturais mais associados à identidade inicial de River
+Pines. Os habitantes passaram a reconhecer a comunidade como uma oportunidade de escapar das
+dificuldades que haviam enfrentado no continente, e a cooperação era frequentemente
+apresentada por Alfred como a principal garantia de sobrevivência da cidade. A população
+inicial registrada era de oitenta e duas pessoas, número que incluía adultos, idosos e
+crianças. Apesar das limitações materiais, o grupo conseguiu estabelecer uma estrutura
+habitacional funcional e iniciou o planejamento de uma construção que se tornaria o
+principal símbolo da cidade durante suas primeiras décadas.
 
-O Hotel New Journey foi concebido como uma obra destinada a receber visitantes, viajantes, comerciantes e famílias que eventualmente chegassem à ilha. Sua construção, iniciada ainda durante os primeiros estágios de desenvolvimento urbano, exigiu uma quantidade considerável de madeira, ferramentas e mão de obra, tornando-se um empreendimento excepcional para uma comunidade com recursos tão limitados. O edifício destacava-se pela dimensão, pela quantidade de quartos e pela capacidade de acomodar diversas famílias simultaneamente. Diferentemente das pequenas residências espalhadas pelo núcleo urbano, o hotel possuía instalações coletivas, espaços destinados à alimentação, áreas de convivência e dependências que permitiam receber pessoas por períodos prolongados. Sua presença demonstrava que os fundadores não pretendiam apenas sobreviver na ilha, mas também criar uma localidade capaz de estabelecer relações comerciais com visitantes externos. A inauguração do New Journey foi tratada como um acontecimento histórico, e a construção passou a representar a promessa de prosperidade de River Pines. Para os habitantes, o nome escolhido expressava a ideia de uma nova jornada, uma oportunidade de abandonar os traumas do passado e construir um futuro diferente. Durante os anos seguintes, o hotel receberia viajantes de diversas origens e contribuiria significativamente para o crescimento da economia local. Nenhum dos documentos da fundação, contudo, menciona qualquer preocupação relacionada à localização do edifício, apesar de sua proximidade com uma das rotas que conduziam às regiões mais densas da floresta. Essa ausência de observações seria posteriormente considerada relevante por alguns investigadores, embora não existam provas de que os fundadores conhecessem qualquer fenômeno incomum associado à região.
+O Hotel New Journey foi concebido como uma obra destinada a receber visitantes, viajantes,
+comerciantes e famílias que eventualmente chegassem à ilha. Sua construção, iniciada ainda
+durante os primeiros estágios de desenvolvimento urbano, exigiu uma quantidade considerável
+de madeira, ferramentas e mão de obra, tornando-se um empreendimento excepcional para uma
+comunidade com recursos tão limitados. O edifício destacava-se pela dimensão, pela
+quantidade de quartos e pela capacidade de acomodar diversas famílias simultaneamente.
+Diferentemente das pequenas residências espalhadas pelo núcleo urbano, o hotel possuía
+instalações coletivas, espaços destinados à alimentação, áreas de convivência e dependências
+que permitiam receber pessoas por períodos prolongados. Sua presença demonstrava que os
+fundadores não pretendiam apenas sobreviver na ilha, mas também criar uma localidade capaz
+de estabelecer relações comerciais com visitantes externos. A inauguração do New Journey foi
+tratada como um acontecimento histórico, e a construção passou a representar a promessa de
+prosperidade de River Pines. Para os habitantes, o nome escolhido expressava a ideia de uma
+nova jornada, uma oportunidade de abandonar os traumas do passado e construir um futuro
+diferente. Durante os anos seguintes, o hotel receberia viajantes de diversas origens e
+contribuiria significativamente para o crescimento da economia local. Nenhum dos documentos
+da fundação, contudo, menciona qualquer preocupação relacionada à localização do edifício,
+apesar de sua proximidade com uma das rotas que conduziam às regiões mais densas da
+floresta. Essa ausência de observações seria posteriormente considerada relevante por alguns
+investigadores, embora não existam provas de que os fundadores conhecessem qualquer fenômeno
+incomum associado à região.

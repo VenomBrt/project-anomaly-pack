@@ -1,0 +1,11 @@
+# Quem pode publicar a lore oficial.
+#
+# O workflow de publicação lê esta lista e confere o usuário do GitHub que
+# enviou a mudança. Quem não estiver aqui pode até ter escrito o texto, mas a
+# release automática não é publicada.
+#
+# Isto não substitui as permissões do GitHub: o trabalho de verdade é feito
+# pelas regras de branch e pelo CODEOWNERS. A lista é a segunda fechadura.
+#
+# Um nome por linha. O "@" é opcional. Linhas com "#" são comentários.
+VenomBrt

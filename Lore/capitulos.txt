@@ -1,20 +1,21 @@
 # O launcher lê este arquivo para saber o que já pode ser lido.
-# O bloco "liberacao" do lore.json é aplicado a partir da 0.3.4; uma linha
-# explícita aqui vence a agenda quando for preciso abrir ou fechar na mão.
+# true = aberto; false = lacrado. A lista é a única chave: não há agenda.
+#
+# Só o dono e os admins do repositório publicam mudanças aqui. Para abrir um
+# capítulo, troque o false por true e envie; a release automática cuida do
+# resto e todos os launchers recebem na próxima sincronização.
 
 introducao = true
 capitulo 1 = true
 capitulo 2 = true
-
-# Agenda original (lore.json):
-# capitulo 3  = 2026-11-15
-# capitulo 4  = 2026-11-22
-# capitulo 5  = 2026-11-29
-# capitulo 6  = 2026-12-06
-# capitulo 7  = 2026-12-13
-# capitulo 8  = 2026-12-20
-# capitulo 9  = 2026-12-27
-# capitulo 10 = 2027-01-03
-# capitulo 11 = 2027-01-10
-# capitulo 12 = 2027-01-17
-# encerramento = 2027-01-24
+capitulo 3 = true
+capitulo 4 = false
+capitulo 5 = false
+capitulo 6 = false
+capitulo 7 = false
+capitulo 8 = false
+capitulo 9 = false
+capitulo 10 = false
+capitulo 11 = false
+capitulo 12 = false
+encerramento = false

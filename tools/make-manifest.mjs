@@ -15,7 +15,7 @@
  *   NoMods/      list.txt
  *   NoTexture/   list.txt
  *   Server/      server.json (address, port, autoJoin)
- *   Lore/        lore.json, capitulos.txt e os .txt de Lore/texto/
+ *   Lore/        lore.json, capitulos.txt, editores.txt e os .txt de Lore/texto/
  *
  * Uso:
  *   node tools/make-manifest.mjs                      gera o manifest.json
@@ -51,7 +51,7 @@ const RULES = {
   NoMods: { only: ['list.txt'] },
   NoTexture: { only: ['list.txt'] },
   Server: { only: ['server.json'], json: true },
-  Lore: { only: ['lore.json', 'capitulos.txt'] }
+  Lore: { only: ['lore.json', 'capitulos.txt', 'editores.txt'] }
 }
 const DIRS = Object.keys(RULES)
 
@@ -175,6 +175,31 @@ function checkLoreJson(text, path) {
   })
 }
 
+/**
+ * Confere a lista de quem pode publicar a lore.
+ *
+ * A lista não é a fechadura principal — as permissões do GitHub são —, mas um
+ * arquivo vazio ou com nome impossível faria a publicação automática recusar
+ * todo mundo. Melhor descobrir isso na conferência do que no push.
+ */
+function checkEditors(text, path) {
+  const names = []
+  text.split(/\r?\n/).forEach((line, index) => {
+    const content = line.replace(/#.*/, '').trim()
+    if (content.length === 0) return
+    const name = content.replace(/^@/, '')
+    if (!/^[A-Za-z0-9-]{1,39}$/.test(name)) {
+      bad(`${path}: linha ${index + 1}: "${content}" não é um usuário do GitHub.`)
+      return
+    }
+    names.push(name.toLowerCase())
+  })
+  if (names.length === 0) bad(`${path}: a lista está vazia; ninguém poderia publicar a lore.`)
+  if (new Set(names).size !== names.length) {
+    warn(`${path}: há usuário repetido na lista de editores.`)
+  }
+}
+
 /** A data existe no calendário? 31 de fevereiro não existe. */
 function realDay(value) {
   if (typeof value !== 'string') return false
@@ -237,6 +262,8 @@ async function walk(dir, out, rule = RULES[dir]) {
 
     if (path === 'Lore/lore.json') {
       checkLoreJson(buffer.toString('utf8'), path)
+    } else if (path === 'Lore/editores.txt') {
+      checkEditors(buffer.toString('utf8'), path)
     } else if (rule.json) {
       if (path === 'Server/server.json') checkServerJson(buffer.toString('utf8'), path)
       else {
